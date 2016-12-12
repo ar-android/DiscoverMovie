@@ -1,5 +1,6 @@
-package com.ahmadrosid.finalproject;
+package com.ahmadrosid.finalproject.ui;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
@@ -9,6 +10,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.ahmadrosid.finalproject.R;
 import com.ahmadrosid.finalproject.adapter.AdapterDiscoverMovie;
 import com.ahmadrosid.finalproject.api.Api;
 import com.ahmadrosid.finalproject.api.ResponseDiscover;
@@ -32,11 +34,12 @@ public class MainActivity extends AppCompatActivity {
         list_movie.setLayoutManager(new GridLayoutManager(this, 2));
 
         Api.discover(new Api.Result() {
-            @Override public void onSuccess(String response) {
-                Gson gson = new Gson();
-                ResponseDiscover responseDiscover = gson.fromJson(response, ResponseDiscover.class);
-                adapter = new AdapterDiscoverMovie(responseDiscover.getResults());
-                list_movie.setAdapter(adapter);
+            @Override public void onSuccess(final String response) {
+                MainActivity.this.runOnUiThread(new Runnable() {
+                    @Override public void run() {
+                        handleResponse(response);
+                    }
+                });
             }
 
             @Override public void onError(Throwable throwable) {
@@ -46,21 +49,30 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    private void handleResponse(String response) {
+        Gson gson = new Gson();
+        ResponseDiscover responseDiscover = gson.fromJson(response, ResponseDiscover.class);
+        adapter = new AdapterDiscoverMovie(responseDiscover.getResults(),
+                new AdapterDiscoverMovie.OnItemClickListener() {
+                    @Override public void onClick(ResponseDiscover.ResultsBean resultsBean) {
+                        Intent intent = new Intent(MainActivity.this, DetailMovie.class);
+                        intent.putExtra("data", resultsBean);
+                        startActivity(intent);
+                    }
+                });
+        list_movie.setAdapter(adapter);
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
         }

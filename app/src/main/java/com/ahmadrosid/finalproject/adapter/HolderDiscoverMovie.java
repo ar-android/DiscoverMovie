@@ -9,6 +9,8 @@ import com.ahmadrosid.finalproject.R;
 import com.ahmadrosid.finalproject.api.ResponseDiscover;
 import com.bumptech.glide.Glide;
 
+import static com.ahmadrosid.finalproject.api.Endpoint.URL_IMAGE_500;
+
 /**
  * Created by ocittwo on 12/11/16.
  *
@@ -18,6 +20,7 @@ import com.bumptech.glide.Glide;
  * @Web http://ahmadrosid.com
  */
 public class HolderDiscoverMovie extends RecyclerView.ViewHolder{
+
     private ImageView image;
     private TextView title;
 
@@ -28,9 +31,10 @@ public class HolderDiscoverMovie extends RecyclerView.ViewHolder{
     }
 
     public void bind(ResponseDiscover.ResultsBean data) {
-        String url_image = "";
+        String url_image = URL_IMAGE_500 + data.getPoster_path();
         Glide.with(itemView.getContext())
                 .load(url_image)
                 .into(image);
+        title.setText(data.getTitle());
     }
 }

@@ -21,9 +21,11 @@ import java.util.List;
 public class AdapterDiscoverMovie extends RecyclerView.Adapter<HolderDiscoverMovie>{
 
     private List<ResponseDiscover.ResultsBean> data;
+    private OnItemClickListener clickListener;
 
-    public AdapterDiscoverMovie(List<ResponseDiscover.ResultsBean> data) {
+    public AdapterDiscoverMovie(List<ResponseDiscover.ResultsBean> data, OnItemClickListener clickListener) {
         this.data = data;
+        this.clickListener = clickListener;
     }
 
     @Override public HolderDiscoverMovie onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -31,12 +33,20 @@ public class AdapterDiscoverMovie extends RecyclerView.Adapter<HolderDiscoverMov
         return new HolderDiscoverMovie(view);
     }
 
-    @Override public void onBindViewHolder(HolderDiscoverMovie holder, int position) {
+    @Override public void onBindViewHolder(HolderDiscoverMovie holder, final int position) {
         holder.bind(data.get(position));
-
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) {
+                clickListener.onClick(data.get(position));
+            }
+        });
     }
 
     @Override public int getItemCount() {
-        return 0;
+        return data.size();
+    }
+
+    public interface OnItemClickListener{
+        void onClick(ResponseDiscover.ResultsBean resultsBean);
     }
 }
